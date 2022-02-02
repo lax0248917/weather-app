@@ -4,7 +4,6 @@ import argparse
 import json
 import sys
 from configparser import ConfigParser
-from turtle import color
 from urllib import error, parse, request
 
 import style
