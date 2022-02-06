@@ -33,6 +33,9 @@ def read_user_cli_args():
     parser.add_argument(
         "city", nargs="+", type=str, help="enter the city name"
     )
+    parser.add_argument("state", nargs="+", type=str, help="enter the state")
+    parser.add_argument("country", nargs='+', type=str,
+                        help="enter in the country")
     parser.add_argument(
         "-i",
         "--imperial",
@@ -42,7 +45,7 @@ def read_user_cli_args():
     return parser.parse_args()
 
 
-def build_weather_query(city_input, imperial=False):
+def build_weather_query(city_input, state_input, country_input, imperial=False):
     """Builds the URL for an API request to OpenWeather's weather API
     Args:
         city_imput (List[str]): Name of a city as collected by argparse
@@ -53,10 +56,14 @@ def build_weather_query(city_input, imperial=False):
     """
     api_key = _get_api_key()
     city_name = " ".join(city_input)
+    state_name = " ".join(state_input)
+    country_name = " ".join(country_input)
     url_encoded_city_name = parse.quote_plus(city_name)
+    url_encoded_state_name = parse.quote_plus(state_name)
+    url_encoded_country_name = parse.quote_plus(country_name)
     units = "imperial" if imperial else "metric"
     url = (
-        f"{BASE_WEATHER_API_URL}?q={url_encoded_city_name}"
+        f"{BASE_WEATHER_API_URL}?q={url_encoded_city_name},{url_encoded_state_name},{url_encoded_country_name}"
         f"&units={units}&appid={api_key}"
     )
     return url
@@ -155,6 +162,7 @@ def _select_weather_display_params(weather_id):
 
 if __name__ == "__main__":
     user_args = read_user_cli_args()
-    query_url = build_weather_query(user_args.city, user_args.imperial)
+    query_url = build_weather_query(
+        user_args.city, user_args.state, user_args.country, user_args.imperial)
     weather_data = get_weather_data(query_url)
     display_weather_info(weather_data, user_args.imperial)
